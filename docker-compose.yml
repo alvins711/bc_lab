@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  # claude server
+  claude-ssh:
+    build: .
+    container_name: claude_workspace
+    restart: unless-stopped
+    ports:
+      - "2223:22" # Accessible via host_ip:2223
+    stdin_open: true
+    tty: true
+
+  # 1. Guacamole Proxy Daemon
+  guacd:
+    image: guacamole/guacd:1.5.5
+    container_name: guacamole_guacd
+    restart: always
+
+  # 2. PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: guacamole_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: guacamole_db
+      POSTGRES_USER: guacamole_user
+      POSTGRES_PASSWORD: ChooseAStrongPassword123! # Change this in production!
+    volumes:
+#      - ./guac_db:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+      - guac_db:/var/lib/postgresql/data         # Named volume (can be wiped with -v)
+#      - ./init:/docker-entrypoint-initdb.d         # Bind mount (reads your local files)
+
+  # 3. Guacamole Web Application
+  guacamole:
+    image: guacamole/guacamole:1.5.5
+    container_name: guacamole_web
+    restart: always
+    ports:
+      - "8081:8080" # Explicitly binds to all network interfaces
+
+    environment:
+      - GUACD_HOSTNAME=guacd
+      - GUACD_PORT=4822
+      - POSTGRESQL_HOSTNAME=postgres
+      - POSTGRESQL_DATABASE=guacamole_db
+      - POSTGRESQL_USER=guacamole_user
+      - POSTGRESQL_PASSWORD=ChooseAStrongPassword123!
+    depends_on:
+      - guacd
+      - postgres
+
+volumes:
+  guac_db:
