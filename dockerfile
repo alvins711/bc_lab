@@ -34,6 +34,8 @@ COPY scripts/custom_bashrc.tmpl ./custom_bashrc.tmpl
 
 # Ensure the scripts are executable
 RUN sed -i 's/\r$//' /usr/local/bin/create_ubuntu_users.sh
+RUN sed -i 's/\r$//' /usr/local/bin/cleanup_ubuntu_users.sh
+RUN sed -i 's/\r$//' ./custom_bashrc.tmpl
 RUN chmod +x /usr/local/bin/create_ubuntu_users.sh /usr/local/bin/cleanup_ubuntu_users.sh
 
 # 6. Expose the standard SSH port inside the container
