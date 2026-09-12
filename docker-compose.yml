@@ -59,6 +59,8 @@ services:
       - "80:80"
       - "443:443"
       - "443:443/udp" # Optional: Enables HTTP/3 support
+    environment:
+      - LOCAL_IP=${LOCAL_IP}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data

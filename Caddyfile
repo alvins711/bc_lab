@@ -1,9 +1,9 @@
 {
-    # Forces Caddy to use this IP address when the browser doesn't send a domain name
-    default_sni 192.168.68.96
+    # Automatically reads the LOCAL_IP environment variable
+    default_sni {$LOCAL_IP}
 }
 
-192.168.68.96, localhost {
+{$LOCAL_IP}, localhost {
     tls {
         issuer internal
     }

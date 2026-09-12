@@ -1,10 +1,15 @@
 # Claude Code Lab environment setup guide
 
+## Requirements
+
+Setup Requires Docker installed, On Windows Docker over WSL
+
 ## Docker container setup:
 
 1. Navigate to folder containing docker files
 2. Run in terminal to build and deploy containers 
-  > docker compose up -d --build
+  > <!-- docker compose up -d --build -->
+  > wsl ./install_lab.sh
 3. Execute to check if containers are deployed and running
   > docker ps to check containers are running
 
@@ -12,7 +17,8 @@
 
 5. Execute to create users in the linux server
   > docker exec -it claude_workspace create_ubuntu_users.sh
-	  >> enter how many users to create
+	  
+>  > enter how many users to create
 
 6. verify new users exist
     > docker exec -it claude_workspace getent passwd

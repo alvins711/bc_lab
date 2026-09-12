@@ -1,4 +1,3 @@
-docker-compose.yml.bak
-dockerfile.old
+.env
 scripts/*.p*1
 scripts/custom_bashrc.tmpl.local
