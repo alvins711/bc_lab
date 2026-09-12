@@ -30,9 +30,10 @@
 1. cd to the scripts directory
 
 2. Execute in a terminal
-  > ./new_guacusers.sh (linux) or 
-  > .\new_guacusers.ps1 (windows)
-	>> enter same number of users as above
+  
+    > wsl ./new_guacusers.sh
+	
+    >> enter same number of users as above
 
 3. verify guac users and connections - http://localhost:8081/guacamole, user guacadmin/guacadmin
 

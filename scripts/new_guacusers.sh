@@ -3,7 +3,7 @@
 # ==========================================
 # CONFIGURATION - UPDATE THESE FOR YOUR ENV
 # ==========================================
-GUAC_URL="http://localhost:8081/guacamole"
+GUAC_URL="https://localhost/guacamole"
 ADMIN_USER="guacadmin"
 ADMIN_PASS="guacadmin"
 
@@ -45,13 +45,21 @@ echo "------------------------------------------------"
 # ==========================================
 echo "Authenticating admin user..."
 
-AUTH_RESPONSE=$(curl -s -X POST "${GUAC_URL}/api/tokens" \
+AUTH_RESPONSE=$(curl -k -s -X POST "${GUAC_URL}/api/tokens" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   --data-urlencode "username=${ADMIN_USER}" \
   --data-urlencode "password=${ADMIN_PASS}")
 
-AUTH_TOKEN=$(echo "$AUTH_RESPONSE" | grep -o '"authToken":"[^"]*' | grep -o '[^"]*$')
-DATA_SOURCE=$(echo "$AUTH_RESPONSE" | grep -o '"dataSource":"[^"]*' | grep -o '[^"]*$')
+#AUTH_TOKEN=$(echo "$AUTH_RESPONSE" | grep -o '"authToken":"[^"]*' | grep -o '[^"]*$')
+#DATA_SOURCE=$(echo "$AUTH_RESPONSE" | grep -o '"dataSource":"[^"]*' | grep -o '[^"]*$')
+
+# Replace the parsing in Step 1 with this:
+if [[ "$AUTH_RESPONSE" =~ \"authToken\":\"([^\"]+)\" ]]; then
+    AUTH_TOKEN="${BASH_REMATCH[1]}"
+fi
+if [[ "$AUTH_RESPONSE" =~ \"dataSource\":\"([^\"]+)\" ]]; then
+    DATA_SOURCE="${BASH_REMATCH[1]}"
+fi
 
 if [ -z "$AUTH_TOKEN" ]; then
     echo "❌ Authentication failed! Response was:"
@@ -92,11 +100,15 @@ CONN_PAYLOAD=$(cat <<EOF
 EOF
 )
 
-CONN_RESPONSE=$(curl -s -X POST "${GUAC_URL}/api/session/data/${DATA_SOURCE}/connections?token=${AUTH_TOKEN}" \
+CONN_RESPONSE=$(curl -k -s -X POST "${GUAC_URL}/api/session/data/${DATA_SOURCE}/connections?token=${AUTH_TOKEN}" \
   -H "Content-Type: application/json" \
   -d "$CONN_PAYLOAD")
 
-CONN_ID=$(echo "$CONN_RESPONSE" | grep -o '"identifier":"[^"]*' | grep -o '[^"]*$')
+#CONN_ID=$(echo "$CONN_RESPONSE" | grep -o '"identifier":"[^"]*' | grep -o '[^"]*$')
+# Replace the parsing in Step 2 with this:
+if [[ "$CONN_RESPONSE" =~ \"identifier\":\"([^\"]+)\" ]]; then
+    CONN_ID="${BASH_REMATCH[1]}"
+fi
 
 if [ -z "$CONN_ID" ]; then
     echo "❌ Failed to create connection! Response:"
@@ -135,7 +147,7 @@ for ((i=1; i<=USER_COUNT; i++)); do
 EOF
 )
 
-    USER_RESPONSE=$(curl -s -X POST "${GUAC_URL}/api/session/data/${DATA_SOURCE}/users?token=${AUTH_TOKEN}" \
+    USER_RESPONSE=$(curl -k -s -X POST "${GUAC_URL}/api/session/data/${DATA_SOURCE}/users?token=${AUTH_TOKEN}" \
       -H "Content-Type: application/json" \
       -d "$USER_PAYLOAD")
 
@@ -160,7 +172,7 @@ EOF
 EOF
 )
 
-    PERM_RESPONSE=$(curl -s -X PATCH "${GUAC_URL}/api/session/data/${DATA_SOURCE}/users/${CURRENT_USER}/permissions?token=${AUTH_TOKEN}" \
+    PERM_RESPONSE=$(curl -k -s -X PATCH "${GUAC_URL}/api/session/data/${DATA_SOURCE}/users/${CURRENT_USER}/permissions?token=${AUTH_TOKEN}" \
       -H "Content-Type: application/json" \
       -d "$PERM_PAYLOAD")
 

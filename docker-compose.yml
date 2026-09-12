@@ -27,19 +27,18 @@ services:
       POSTGRES_USER: guacamole_user
       POSTGRES_PASSWORD: ChooseAStrongPassword123! # Change this in production!
     volumes:
-#      - ./guac_db:/var/lib/postgresql/data
       - ./init:/docker-entrypoint-initdb.d
       - guac_db:/var/lib/postgresql/data         # Named volume (can be wiped with -v)
-#      - ./init:/docker-entrypoint-initdb.d         # Bind mount (reads your local files)
 
   # 3. Guacamole Web Application
   guacamole:
     image: guacamole/guacamole:1.5.5
     container_name: guacamole_web
     restart: always
-    ports:
-      - "8081:8080" # Explicitly binds to all network interfaces
-
+    # Removed public port mapping "8081:8080" to prevent bypassing the proxy.
+    # Caddy will communicate with it internally over the Docker network on port 8080.
+    expose:
+      - "8080"
     environment:
       - GUACD_HOSTNAME=guacd
       - GUACD_PORT=4822
@@ -51,5 +50,23 @@ services:
       - guacd
       - postgres
 
+  # 4. Caddy Reverse Proxy
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy_proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp" # Optional: Enables HTTP/3 support
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - guacamole
+
 volumes:
   guac_db:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,13 @@
+{
+    # Forces Caddy to use this IP address when the browser doesn't send a domain name
+    default_sni 192.168.68.96
+}
+
+192.168.68.96, localhost {
+    tls {
+        issuer internal
+    }
+
+    redir / /guacamole/
+    reverse_proxy guacamole:8080
+}

@@ -1,7 +1,7 @@
 # ==========================================
 # CONFIGURATION - UPDATE THESE FOR YOUR ENV
 # ==========================================
-$GuacUrl      = "http://localhost:8081/guacamole"
+$GuacUrl      = "https://localhost"
 $AdminUser    = "guacadmin"
 $AdminPass    = "guacadmin"
 
